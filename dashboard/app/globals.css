@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --background: 0 0% 4%;
+  --foreground: 240 10% 95%;
+}
+
+* {
+  @apply selection:bg-accent-green/30 selection:text-accent-green;
+}
+
+body {
+  @apply bg-background-primary text-text-primary font-body antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-heading tracking-tight;
+}
+
+.mono {
+  @apply font-display tracking-wider;
+}
+
+.token {
+  @apply font-mono bg-accent-green/10 border border-accent-green/20 text-accent-green rounded px-2 py-0.5;
+}
+
+.pii-badge {
+  @apply font-body font-medium uppercase text-[10px] tracking-widest bg-accent-red/10 border border-accent-red/20 text-accent-red rounded px-1.5 py-0.5;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background-primary;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full hover:bg-border-accent transition-colors;
+}
