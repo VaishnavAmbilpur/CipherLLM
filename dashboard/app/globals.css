@@ -1,46 +1,89 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap');
-
-:root {
-  --background: 0 0% 4%;
-  --foreground: 240 10% 95%;
+@theme {
+  --color-background: #050505;
+  --color-surface: #0D0D10;
+  --color-elevated: #15151A;
+  --color-primary: #00F5FF;
+  --color-secondary: #7B61FF;
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
 }
 
-* {
-  @apply selection:bg-accent-green/30 selection:text-accent-green;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-body {
-  @apply bg-background-primary text-text-primary font-body antialiased;
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-h1, h2, h3, h4, h5, h6 {
-  @apply font-heading tracking-tight;
+.animate-fade-in {
+  animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.mono {
-  @apply font-display tracking-wider;
+.animate-slide-up {
+  animation: slideUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.token {
-  @apply font-mono bg-accent-green/10 border border-accent-green/20 text-accent-green rounded px-2 py-0.5;
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-700 { animation-delay: 0.7s; }
+
+@theme {
+  --color-border-active: rgba(255, 255, 255, 0.15);
+  --color-textMain: #FFFFFF;
+  --color-textDim: #A1A1AA;
+  --color-textMuted: #52525B;
+  --color-danger: #FF4D4D;
+  --color-success: #00FF94;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  
+  --shadow-glow-primary: 0 0 20px rgba(0, 245, 255, 0.3);
 }
 
-.pii-badge {
-  @apply font-body font-medium uppercase text-[10px] tracking-widest bg-accent-red/10 border border-accent-red/20 text-accent-red rounded px-1.5 py-0.5;
+@layer base {
+  body {
+    @apply bg-background text-textMain font-sans antialiased selection:bg-primary/30;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-surface border border-border-subtle backdrop-blur-md rounded-2xl transition-all duration-300;
+  }
+  
+  .glass-card:hover {
+    @apply border-border-active shadow-2xl;
+  }
+
+  .btn-primary {
+    @apply px-6 py-2.5 bg-primary text-background font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-lg;
+  }
+
+  .nav-link {
+    @apply flex items-center space-x-3 px-4 py-3 rounded-xl text-textDim hover:text-textMain hover:bg-white/5 transition-all;
+  }
+
+  .nav-link.active {
+    @apply text-primary bg-primary/10;
+  }
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-background-primary;
+  @apply bg-background;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-border rounded-full hover:bg-border-accent transition-colors;
+  @apply bg-textMuted/30 rounded-full hover:bg-textMuted/50 transition-all;
 }

@@ -1,32 +1,49 @@
 {
-  "version": "1.0.0",
   "name": "cipherllm",
-  "description": "Privacy-first LLM gateway for PII redaction and re-hydration.",
+  "version": "1.0.0",
+  "description": "Privacy-first LLM prompt gateway. Strips Indian PII (Aadhaar, PAN, UPI) before it reaches any AI provider and re-hydrates locally. DPDP Act 2023 compliant.",
   "main": "dist/src/lib.js",
   "types": "dist/src/lib.d.ts",
+  "files": [
+    "dist/src",
+    "README.md",
+    "docs/"
+  ],
   "scripts": {
-    "test": "jest",
-    "start": "ts-node src/index.ts",
-    "dev": "nodemon src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "prepublishOnly": "npm run build && npm test"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "llm",
+    "privacy",
+    "pii",
+    "aadhaar",
+    "pan",
+    "dpdp",
+    "india",
+    "openai",
+    "anthropic",
+    "redaction",
+    "tokenization",
+    "security"
+  ],
+  "author": "CipherLLM",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VaishnavAmbilpur/CipherLLM"
+  },
+  "homepage": "https://cipherllm.in",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.88.0",
-    "axios": "^1.15.0",
     "compromise": "^14.15.0",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
     "openai": "^6.34.0",
-    "typescript": "^6.0.2",
     "uuid": "^13.0.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.6.0",
     "@types/supertest": "^7.2.0",
@@ -34,6 +51,7 @@
     "nodemon": "^3.1.14",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2"
   }
 }

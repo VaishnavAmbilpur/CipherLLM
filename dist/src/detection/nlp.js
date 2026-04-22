@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.extractEntities = extractEntities;
 // import nlp from 'compromise'; // Sometimes TS has issues with compromise default import
 const nlp = require('compromise');
 /**
  * Extracts entities (People, Organizations, Places) from a string.
  */
-function extractEntities(text) {
+export function extractEntities(text) {
     const doc = nlp(text);
     const entities = [];
     // Extract People

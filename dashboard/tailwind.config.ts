@@ -9,37 +9,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: {
-          primary: "#0A0A0F",
-          surface: "#111118",
-          elevated: "#16161F",
-        },
-        border: {
-          DEFAULT: "#1E1E2E",
-          accent: "#2A2A3E",
-        },
-        text: {
-          primary: "#F0F0F5",
-          secondary: "#7A7A9A",
-          muted: "#3A3A5A",
-        },
-        accent: {
-          green: "#00FF88",
-          red: "#FF4466",
-          blue: "#4488FF",
-          yellow: "#FFCC44",
-        },
+        background: "#050505",
+        surface: "#0D0D10",
+        elevated: "#15151A",
+        primary: "#00F5FF",
+        secondary: "#7B61FF",
+        "border-subtle": "rgba(255, 255, 255, 0.05)",
+        "border-active": "rgba(255, 255, 255, 0.15)",
+        textMain: "#FFFFFF",
+        textDim: "#A1A1AA",
+        textMuted: "#52525B",
+        danger: "#FF4D4D",
+        success: "#00FF94",
       },
       fontFamily: {
-        display: ["Space Mono", "monospace"],
-        heading: ["Syne", "sans-serif"],
-        body: ["DM Sans", "sans-serif"],
+        sans: ["Inter", "sans-serif"],
+        heading: ["Outfit", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
-      boxShadow: {
-        'glow-green': '0 0 20px rgba(0, 255, 136, 0.25)',
-        'glow-red': '0 0 20px rgba(255, 68, 102, 0.25)',
-      }
     },
   },
   plugins: [],

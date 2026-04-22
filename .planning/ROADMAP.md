@@ -5,13 +5,21 @@ CipherLLM will be built in two major milestones. Milestone 1 focuses on the core
 
 ## Phases
 
-- [ ] **Phase 1: Core Engine** - Regex detection, Token Vault logic, and Re-hydration.
-- [ ] **Phase 2: Provider Proxy** - Implementing OpenAI/Anthropic SDK abstraction and Express gateway.
-- [ ] **Phase 3: Security & Storage** - AES-256-GCM vault encryption and session management.
-- [ ] **Phase 4: Intelligence Layer** - Integrating `compromise` for local name and entity detection.
-- [ ] **Phase 5: Dashboard UI** - Next.js dashboard for real-time monitoring and analytics.
-- [ ] **Phase 6: Distribution** - npm package publishing and VS Code extension prototype.
-- [ ] **Phase 7: Compliance** - Audit log generation and DPDP Act compliance reporting.
+- [x] **Phase 1: Core Engine** - Regex detection, Token Vault logic, and Re-hydration.
+- [x] **Phase 2: Provider Proxy** - Implementing OpenAI/Anthropic SDK abstraction and Express gateway.
+- [x] **Phase 3: Security & Storage** - AES-256-GCM vault encryption and session management.
+- [x] **Phase 4: Intelligence Layer** - Integrating `compromise` for local name and entity detection.
+- [x] **Phase 5: Dashboard UI** - Next.js dashboard for real-time monitoring and analytics.
+- [x] **Phase 6: Distribution** - npm package publishing and VS Code extension prototype.
+- [x] **Phase 7: Compliance** - Audit log generation and DPDP Act compliance reporting.
+- [x] **Phase 8: npm-Only Refactor & Strategic Alignment**
+    - [x] Strip server-side infrastructure (Express, CORS, dot-env)
+    - [x] Archive previous dashboard version and server code
+    - [x] Implement 5-layer Gold Standard Architecture (Types -> Detection -> Vault -> Providers -> Gateway)
+    - [x] Migrated to native ESM for modern dependency support (uuid v13)
+    - [x] Unified public API in `src/lib.ts`
+    - [x] Verified build and integration tests (100% pass)
+- [ ] **Phase 9: Documentation & Integration Dashboard** - Interactive landing page for npm package.
 
 ## Phase Details
 
@@ -26,9 +34,9 @@ CipherLLM will be built in two major milestones. Milestone 1 focuses on the core
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: Implement PII detection regex library.
-- [ ] 01-02: Build TokenVault mapping logic.
-- [ ] 01-03: Implement Re-hydration engine with fuzzy matching.
+- [x] 01-01: Implement PII detection regex library.
+- [x] 01-02: Build TokenVault mapping logic.
+- [x] 01-03: Implement Re-hydration engine with fuzzy matching.
 
 ### Phase 2: Provider Proxy
 **Goal**: Create a unified proxy that can talk to OpenAI and Anthropic while applying redaction.
@@ -80,6 +88,15 @@ Plans:
   1. PDF/JSON reports can be exported showing redaction metrics.
 **Plans**: 1 plan
 
+### Phase 8: npm-Only Refactor
+**Goal**: Strip the project down to a clean, publishable npm library as per NPM_PLAN.md.
+**Depends on**: Phase 6
+**Requirements**: REQ-NF3
+**Success Criteria**:
+  1. No server-side or dashboard code remains in the published package.
+  2. Library is successfully publishable and installable via npm.
+**Plans**: 0 plans
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -91,6 +108,8 @@ Plans:
 | 5. Dashboard UI | 2/2 | Complete | 2026-04-14 |
 | 6. Distribution | 2/2 | Complete | 2026-04-14 |
 | 7. Compliance | 1/1 | Complete | 2026-04-14 |
+| 8. npm-Only Refactor | 0/0 | In Progress | - |
+| 9. Documentation Dashboard | 0/3 | In Progress | - |
 
 ---
-*Last updated: 2026-04-14*
+*Last updated: 2026-04-18*

@@ -2,16 +2,18 @@
   "compilerOptions": {
     "target": "es2016",
     "module": "node16",
-    "rootDir": "./",
+    "rootDir": "./src",
     "moduleResolution": "node16",
     "types": ["node", "jest"],
-    "outDir": "./dist",
+    "outDir": "./dist/src",
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "isolatedModules": true
   },
-  "include": ["src/**/*", "tests/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["tests/**/*", "node_modules", "dist", ".archive"]
 }

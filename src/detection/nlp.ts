@@ -44,3 +44,4 @@ export function extractEntities(text: string): ExtractedEntity[] {
       self.findIndex(t => t.text === e.text) === index
     );
 }
+

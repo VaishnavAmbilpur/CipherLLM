@@ -1,86 +1,93 @@
-'use client';
+"use client";
 
 import React from 'react';
-import { Shield, LayoutDashboard, History, FileCheck, Key, BookOpen } from 'lucide-react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { 
+  LayoutDashboard, 
+  ShieldAlert, 
+  Database, 
+  FileCheck, 
+  Terminal, 
+  Settings,
+  ShieldCheck,
+  ChevronRight
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+const navItems = [
+  { label: 'Overview', href: '/', icon: LayoutDashboard },
+  { label: 'Privacy Monitor', href: '/redactions', icon: ShieldAlert },
+  { label: 'Vault Manager', href: '/vault', icon: Database },
+  { label: 'Compliance Audit', href: '/compliance', icon: FileCheck },
+  { label: 'API Playground', href: '/playground', icon: Terminal },
+];
 
-export default function Sidebar() {
-  const [activeTab, setActiveTab] = React.useState('dashboard');
-
-  const menuItems = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { id: 'history', icon: History, label: 'Session History' },
-    { id: 'audit', icon: FileCheck, label: 'Audit Log' },
-  ];
-
-  const utilityItems = [
-    { id: 'keys', icon: Key, label: 'API Keys' },
-    { id: 'docs', icon: BookOpen, label: 'Documentation' },
-  ];
+export function Sidebar() {
+  const pathname = usePathname();
 
   return (
-    <aside className="w-[260px] bg-background-surface border-r border-border flex flex-col h-full overflow-y-auto">
-      <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 rounded bg-accent-green flex items-center justify-center">
-          <Shield className="w-5 h-5 text-background-primary" />
+    <div className="w-72 h-screen border-r border-border-subtle bg-surface flex flex-col sticky top-0">
+      {/* Brand Header */}
+      <div className="p-8 flex items-center space-x-3 group cursor-pointer">
+        <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center border border-primary/30 group-hover:scale-110 transition-transform shadow-lg shadow-primary/10">
+          <ShieldCheck className="w-6 h-6 text-primary" />
         </div>
-        <h1 className="font-heading text-xl font-bold tracking-tight">CipherLLM</h1>
+        <div>
+          <h1 className="text-xl font-heading font-bold text-white tracking-tight">CipherVault</h1>
+          <div className="flex items-center space-x-2">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary/70 font-bold">DS Protocol</p>
+            <span className="px-1.5 py-0.5 rounded-full bg-primary/20 border border-primary/30 text-[8px] text-primary font-black uppercase">NPM Module</span>
+          </div>
+        </div>
       </div>
 
-      <div className="px-6 py-8">
-        <p className="text-text-secondary text-[10px] uppercase tracking-widest mb-4 font-medium">Redaction Stats</p>
-        <div className="bg-background-elevated rounded-lg p-5 border border-border/50 group hover:border-accent-green/30 transition-all shadow-glow-green/5">
-          <p className="font-display text-4xl text-accent-green font-bold mb-1">1,203</p>
-          <p className="text-text-secondary text-xs font-medium uppercase tracking-tight">Items Intercepted</p>
+      <div className="mx-6 px-4 py-3 rounded-xl bg-white/5 border border-border-subtle flex items-center justify-between group cursor-pointer hover:bg-white/10 transition-all">
+        <div className="flex items-center space-x-3">
+          <Terminal className="w-4 h-4 text-primary" />
+          <span className="text-[10px] font-bold text-textDim uppercase tracking-widest">cipherllm v1.0.0</span>
         </div>
+        <ChevronRight className="w-3 h-3 text-textMuted group-hover:translate-x-1 transition-transform" />
       </div>
 
-      <nav className="flex-1 px-4 py-4 space-y-1">
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setActiveTab(item.id)}
-            className={cn(
-              "w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-all group",
-              activeTab === item.id 
-                ? "bg-accent-green/10 text-accent-green" 
-                : "text-text-secondary hover:text-text-primary hover:bg-background-elevated"
-            )}
-          >
-            <item.icon className={cn(
-              "w-4 h-4",
-              activeTab === item.id ? "text-accent-green" : "text-text-muted group-hover:text-text-primary"
-            )} />
-            <span className="text-sm font-medium">{item.label}</span>
-          </button>
-        ))}
+      {/* Navigation */}
+      <nav className="flex-1 px-4 py-6 space-y-2">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          const Icon = item.icon;
+          
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "group flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-300",
+                isActive 
+                  ? "bg-primary/10 text-primary border border-primary/20" 
+                  : "text-textDim hover:text-white hover:bg-white/5 border border-transparent"
+              )}
+            >
+              <div className="flex items-center space-x-4">
+                <Icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-textMuted group-hover:text-textDim")} />
+                <span className="font-medium tracking-tight">{item.label}</span>
+              </div>
+              {isActive && <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-glow-primary" />}
+            </Link>
+          );
+        })}
       </nav>
 
-      <div className="px-4 py-8 space-y-1 mt-auto border-t border-border/50">
-        <p className="px-3 text-text-muted text-[10px] uppercase tracking-widest mb-3 font-medium">Settings</p>
-        {utilityItems.map((item) => (
-          <button
-            key={item.id}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-text-secondary hover:text-text-primary hover:bg-background-elevated transition-all group"
-          >
-            <item.icon className="w-4 h-4 text-text-muted group-hover:text-text-primary" />
-            <span className="text-sm font-medium">{item.label}</span>
-          </button>
-        ))}
-        
-        <div className="mt-6 px-3 py-4 bg-background-elevated/50 rounded-lg border border-border/30">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 rounded-full bg-accent-green animate-pulse" />
-            <span className="text-[10px] uppercase font-bold text-accent-green tracking-wider">Protected</span>
+      {/* Footer Info */}
+      <div className="p-6 border-t border-border-subtle">
+        <div className="glass-card p-4 flex items-center space-x-3">
+          <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+          <div className="flex-1">
+            <p className="text-xs font-bold text-white">System Secure</p>
+            <p className="text-[10px] text-textMuted">v2.4.0-STABLE</p>
           </div>
-          <p className="text-[11px] text-text-muted leading-relaxed font-medium">Session #A3F2 Active</p>
+          <Settings className="w-4 h-4 text-textMuted cursor-pointer hover:rotate-90 transition-transform" />
         </div>
       </div>
-    </aside>
+    </div>
   );
 }

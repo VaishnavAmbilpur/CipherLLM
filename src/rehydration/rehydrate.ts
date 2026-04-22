@@ -1,27 +1,37 @@
-/**
- * Re-hydration Engine
- * 
- * Restores original sensitive values into the LLM's anonymized response.
- */
+// src/rehydration/rehydrate.ts — Intelligent Token Restoration
 
 /**
- * Replaces all tokens in the response with their original values from the vault.
- * Handles case-insensitive matches to account for LLM mangling.
+ * Replaces anonymous tokens in LLM responses with their original sensitive values.
+ * Handles case-mangling, whitespace variation, and partial token matches.
  */
-export function rehydrate(response: string, vault: Map<string, string>): string {
-  let rehydrated = response;
+export function rehydrate(
+  response: string,
+  vault: Map<string, string>
+): string {
+  let result = response;
 
-  for (const [token, originalValue] of vault.entries()) {
-    // Escape brackets for regex
-    const escapedToken = token.replace(/[[\]]/g, '\\$&');
-    
-    // Create a global, case-insensitive regex for the token
-    // Also handles potential variations like spaces or underscores if they were somehow mangled
-    // (though standard format is [TYPE_N])
-    const regex = new RegExp(escapedToken, 'gi');
-    
-    rehydrated = rehydrated.replace(regex, originalValue);
+  // IMPORTANT: Sort tokens by length descending.
+  // This prevents "[PERSON_1]" from matching inside "[PERSON_10]".
+  const sortedTokens = Array.from(vault.keys()).sort(
+    (a, b) => b.length - a.length
+  );
+
+  for (const token of sortedTokens) {
+    const original = vault.get(token)!;
+
+    /**
+     * Build a fuzzy regex for the token.
+     * Escapes [ and ] characters.
+     * Allows underscores (_) to optionally match a space (e.g., [PERSON 1]).
+     */
+    const escaped = token
+      .replace(/[[\]]/g, '\\$&')
+      .replace(/_/g, '[_\\s]?');
+
+    const pattern = new RegExp(escaped, 'gi'); // Global and Case-Insensitive
+    result = result.replace(pattern, original);
   }
 
-  return rehydrated;
+  return result;
 }
+

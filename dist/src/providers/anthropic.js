@@ -1,4 +1,4 @@
-"use strict";
+// src/providers/anthropic.ts — Anthropic Integration
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,37 +8,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnthropicProvider = void 0;
-const sdk_1 = __importDefault(require("@anthropic-ai/sdk"));
-class AnthropicProvider {
-    constructor(apiKey) {
-        this.name = 'anthropic';
-        this.client = new sdk_1.default({ apiKey });
+import Anthropic from '@anthropic-ai/sdk';
+/**
+ * Strategy implementation for Anthropic's Messages API (Claude).
+ */
+export class AnthropicProvider {
+    constructor(apiKey, model = 'claude-sonnet-4-6') {
+        if (!apiKey)
+            throw new Error('Anthropic API key is required');
+        this.client = new Anthropic({ apiKey });
+        this.model = model;
     }
     send(prompt) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const response = yield this.client.messages.create({
-                    model: 'claude-3-5-sonnet-20240620',
-                    max_tokens: 1024,
-                    messages: [{ role: 'user', content: prompt }],
-                });
-                // Anthropic returns an array of content blocks, usually we want the text block
-                const content = response.content[0];
-                if ((content === null || content === void 0 ? void 0 : content.type) === 'text') {
-                    return content.text;
-                }
-                return '';
+            const response = yield this.client.messages.create({
+                model: this.model,
+                max_tokens: 2048,
+                messages: [{ role: 'user', content: prompt }],
+            });
+            const block = response.content[0];
+            if (block.type !== 'text') {
+                throw new Error(`Unexpected Anthropic response type: ${block.type}`);
             }
-            catch (error) {
-                console.error('Anthropic API Error:', error);
-                throw new Error('Failed to fetch from Anthropic');
-            }
+            return block.text;
         });
     }
 }
-exports.AnthropicProvider = AnthropicProvider;

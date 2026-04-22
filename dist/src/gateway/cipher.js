@@ -1,4 +1,4 @@
-"use strict";
+// src/gateway/cipher.ts — The CipherLLM Orchestrator
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,72 +8,93 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CipherLLM = void 0;
-const regex_1 = require("../detection/regex");
-const vault_1 = require("../vault/vault");
-const rehydrate_1 = require("../rehydration/rehydrate");
-const logger_1 = require("../compliance/logger");
-class CipherLLM {
+import { detect } from '../detection/detector.js';
+import { TokenVault } from '../vault/vault.js';
+import { rehydrate } from '../rehydration/rehydrate.js';
+/**
+ * The main gateway entry point. orchestrates the 5-layer privacy lifecycle.
+ */
+export class CipherLLM {
     constructor(provider, logger) {
-        this.vault = new vault_1.TokenVault();
+        // Session management: sessionId -> TokenVault
+        this.sessions = new Map();
         this.provider = provider;
-        this.logger = logger || new logger_1.AuditLogger();
+        this.logger = logger !== null && logger !== void 0 ? logger : null;
     }
     /**
-     * Orchestrates the privacy-preserved chat flow.
+     * Processes a prompt through the privacy pipeline.
+     * 1. Detect PII (with positions)
+     * 2. Tokenize and Sanitize (End-to-Start replacement)
+     * 3. Forward to LLM
+     * 4. Re-hydrate and Restore
      */
-    chat(prompt_1) {
-        return __awaiter(this, arguments, void 0, function* (prompt, sessionId = 'default') {
-            let sanitizedPrompt = prompt;
-            let redactionCount = 0;
-            // Regex Detection & Tokenization
-            for (const [type, regex] of Object.entries(regex_1.PII_PATTERNS)) {
-                regex.lastIndex = 0;
-                const matches = prompt.match(regex);
-                if (matches) {
-                    for (const match of matches) {
-                        const token = this.vault.tokenize(match, type);
-                        sanitizedPrompt = sanitizedPrompt.split(match).join(token);
-                        redactionCount++;
-                        this.logger.log({
-                            sessionId,
-                            piiType: type,
-                            token,
-                            action: 'redact'
-                        });
-                    }
+    chat(prompt, sessionId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c, _d;
+            // 1. Session Retrieval
+            if (!this.sessions.has(sessionId)) {
+                this.sessions.set(sessionId, new TokenVault());
+            }
+            const vault = this.sessions.get(sessionId);
+            // 2. Intelligence Layer: PII Detection
+            // Returns results sorted in REVERSE order by position
+            const detections = detect(prompt);
+            // 3. Sanitization (End-to-Start)
+            let sanitized = prompt;
+            for (const d of detections) {
+                if (d.start !== undefined && d.end !== undefined) {
+                    const token = vault.tokenize(d.original, d.type);
+                    // Replace exactly at the detected positions
+                    sanitized = sanitized.slice(0, d.start) + token + sanitized.slice(d.end);
+                    // Audit: Trace Tokenization
+                    (_a = this.logger) === null || _a === void 0 ? void 0 : _a.log({
+                        timestamp: new Date().toISOString(),
+                        sessionId,
+                        piiType: d.type,
+                        token,
+                        action: 'TOKENIZED',
+                    });
                 }
             }
-            // NLP Intelligence Layer (Phase 4)
-            const { extractEntities } = require('../detection/nlp');
-            const nlpEntities = extractEntities(sanitizedPrompt);
-            for (const entity of nlpEntities) {
-                const token = this.vault.tokenize(entity.text, entity.type);
-                sanitizedPrompt = sanitizedPrompt.split(entity.text).join(token);
-                redactionCount++;
-                this.logger.log({
-                    sessionId,
-                    piiType: entity.type,
-                    token,
-                    action: 'redact'
-                });
+            // 4. External LLM Communication (Clean Prompt)
+            const rawResponse = yield this.provider.send(sanitized);
+            // 5. Intelligent Re-hydration
+            const finalResponse = rehydrate(rawResponse, vault.getAll());
+            // 6. Audit: Trace Restoration
+            for (const [token] of vault.getAll()) {
+                if (rawResponse.toLowerCase().includes(token.toLowerCase())) {
+                    (_b = this.logger) === null || _b === void 0 ? void 0 : _b.log({
+                        timestamp: new Date().toISOString(),
+                        sessionId,
+                        piiType: (_d = (_c = token.match(/\[(\w+)_\d+\]/)) === null || _c === void 0 ? void 0 : _c[1]) !== null && _d !== void 0 ? _d : 'UNKNOWN',
+                        token,
+                        action: 'REHYDRATED',
+                    });
+                }
             }
-            // Send to LLM
-            const rawResponse = yield this.provider.send(sanitizedPrompt);
-            // Re-hydration
-            const rehydratedResponse = (0, rehydrate_1.rehydrate)(rawResponse, this.vault.getAll());
             return {
-                response: rehydratedResponse,
-                redactionCount: redactionCount
+                response: finalResponse,
+                redactionCount: detections.length,
             };
         });
     }
     /**
-     * Clears the current session data.
+     * Manually clears the privacy vault for a specific session.
      */
-    clearSession() {
-        this.vault.destroy();
+    clearSession(sessionId) {
+        const vault = this.sessions.get(sessionId);
+        if (vault) {
+            vault.destroy();
+            this.sessions.delete(sessionId);
+        }
+    }
+    /**
+     * Emergency wipe of all active session data.
+     */
+    clearAllSessions() {
+        for (const vault of this.sessions.values()) {
+            vault.destroy();
+        }
+        this.sessions.clear();
     }
 }
-exports.CipherLLM = CipherLLM;

@@ -1,8 +1,11 @@
+import { Detection } from '../types.js';
 /**
- * CipherLLM PII Regex Library
- *
- * Standardized patterns for detecting sensitive data.
- * Focused on Indian PII (Aadhaar, PAN, UPI, Phone) and Universal PII (Email, API Keys).
+ * Registry of regex patterns for structured PII.
+ * Focuses primarily on Indian-market identifiers (Aadhaar, PAN, UPI).
  */
 export declare const PII_PATTERNS: Record<string, RegExp>;
+/**
+ * Scans text for structured PII using the pattern library.
+ */
+export declare function detectWithRegex(text: string): Detection[];
 //# sourceMappingURL=regex.d.ts.map

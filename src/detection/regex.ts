@@ -1,37 +1,50 @@
+// src/detection/regex.ts — Structured PII Detection
+
+import { Detection } from '../types.js';
+
 /**
- * CipherLLM PII Regex Library
- * 
- * Standardized patterns for detecting sensitive data.
- * Focused on Indian PII (Aadhaar, PAN, UPI, Phone) and Universal PII (Email, API Keys).
+ * Registry of regex patterns for structured PII.
+ * Focuses primarily on Indian-market identifiers (Aadhaar, PAN, UPI).
  */
-
 export const PII_PATTERNS: Record<string, RegExp> = {
-  // --- Indian Specific PII ---
-  
-  // Aadhaar: 12 digit number, often separated by spaces or hyphens.
-  // Pattern: [2-9] followed by 11 digits. Supports optional separators.
-  AADHAAR: /[2-9]\d{3}[\s-]?\d{4}[\s-]?\d{4}/g,
-  
-  // PAN: 10-character alphanumeric string.
-  // 5 letters, 4 digits, 1 letter.
+  // --- INDIAN PII ---
+  AADHAAR: /\d{4}[\s-]?\d{4}[\s-]?\d{4}/g,
   PAN: /[A-Z]{5}[0-9]{4}[A-Z]{1}/g,
-  
-  // Phone (India): Mobile numbers starting with 6-9, optional +91 or 0 prefix.
-  PHONE_IN: /(?:\+91|0)?[6-9]\d{9}/g,
-  
-  // UPI ID: vpa@bank_provider.
-  EMAIL: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
-
-  // Salary (Indian): ₹ symbol followed by numeric value with comma separators.
-  SALARY_IN: /₹\s?\d{1,3}(?:,\d{2,3})*(?:\.\d{1,2})?/g,
-  
-  // UPI ID: vpa@bank_provider.
+  PHONE_IN: /(\+91|0)?[6-9]\d{9}/g,
   UPI: /[a-zA-Z0-9._-]+@[a-zA-Z]{3,}/g,
-  
-  // Credit Card: 13-19 digit numbers (with spaces/hyphens).
-  CREDIT_CARD: /\b(?:\d[\s-]?){13,19}\b/g,
-  
-  // API Keys / Secrets: Alphanumeric strings of 32+ characters.
-  // This is a heuristic and may produce false positives.
-  API_KEY: /[a-zA-Z0-9/+=]{32,}/g,
+  SALARY_IN: /₹\s?\d{1,3}(?:,\d{2,3})*(?:\.\d{1,2})?/g,
+  VOTER_ID: /[A-Z]{3}[0-9]{7}/g,
+
+  // --- UNIVERSAL PII ---
+  EMAIL: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+  SSN: /\d{3}-\d{2}-\d{4}/g,
+  CREDIT_CARD: /\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/g,
+  API_KEY: /[a-zA-Z0-9_-]{32,}/g,
 };
+
+/**
+ * Scans text for structured PII using the pattern library.
+ */
+export function detectWithRegex(text: string): Detection[] {
+  const detections: Detection[] = [];
+
+  for (const [type, pattern] of Object.entries(PII_PATTERNS)) {
+    // Crucial: reset lastIndex for global patterns
+    pattern.lastIndex = 0;
+
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      const value = match[0];
+      
+        detections.push({ 
+          original: value, 
+          type,
+          start: match.index,
+          end: match.index + value.length
+        });
+    }
+  }
+
+  return detections;
+}
+
